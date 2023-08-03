@@ -1,9 +1,9 @@
-package http
+package routes
 
 import (
 	"context"
 	"net/http"
-	"prodocutApi/http/controller"
+	"prodocutApi/controller"
 	"regexp"
 	"strings"
 )
@@ -18,7 +18,8 @@ type route struct {
 }
 
 var routes = []route{
-	newRoute("GET", `\/api\/product`, controller.GETHandlerProduct),
+	controllerProduct := 
+	newRoute("GET", `\/api\/product`, controller.ProductController.GETHandlerProduct),
 	newRoute("GET", `\/api\/product\/([0-9]+)`, controller.GETHandlerOneProduct),
 	newRoute("POST", `\/api\/product`, controller.POSTHandlerProduct),
 	newRoute("PUT", `\/api\/product`, controller.PUTHandlerProduct),

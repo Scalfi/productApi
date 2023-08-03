@@ -3,8 +3,13 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"prodocutApi/service"
 	"strconv"
 )
+
+type ProductController struct {
+	service.ProductServiceInterface
+}
 
 type Product struct {
 	ID    int
@@ -15,19 +20,28 @@ type Product struct {
 var products = make(map[int]Product)
 var ID int
 
-func GETHandlerProduct(w http.ResponseWriter, r *http.Request) {
+func (controller *productController) GETHandlerProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(products)
+	json.NewEncoder(w).Encode(controller.GetProductsService())
 }
 
-func GETHandlerOneProduct(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(GetField(r, 0))
+func (controller *productController) GETHandlerOneProduct(w http.ResponseWriter, r *http.Request) {
+	parameter, err := GetField(r, 0)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode("The parameter is invalid")
+		return
+	}
+
+	id, _ := strconv.Atoi(parameter)
 
 	w.Header().Set("Content-Type", "application/json")
+
 	json.NewEncoder(w).Encode(products[id])
 }
 
-func POSTHandlerProduct(w http.ResponseWriter, r *http.Request) {
+func (controller *productController) POSTHandlerProduct(w http.ResponseWriter, r *http.Request) {
 	newProduct := Product{}
 	err := json.NewDecoder(r.Body).Decode(&newProduct)
 
@@ -48,7 +62,7 @@ func POSTHandlerProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(products[ID])
 }
 
-func PUTHandlerProduct(w http.ResponseWriter, r *http.Request) {
+func (controller *productController) PUTHandlerProduct(w http.ResponseWriter, r *http.Request) {
 	keys, ok := r.URL.Query()["key"]
 
 	w.Header().Set("Content-Type", "application/json")
@@ -79,7 +93,7 @@ func PUTHandlerProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(products[key])
 }
 
-func DELETEHandlerProduct(w http.ResponseWriter, r *http.Request) {
+func (controller *productController) DELETEHandlerProduct(w http.ResponseWriter, r *http.Request) {
 	keys, ok := r.URL.Query()["key"]
 
 	w.Header().Set("Content-Type", "application/json")
